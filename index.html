@@ -674,7 +674,7 @@
                     <img src="${product.image}" alt="${product.name}" class="product-image">
                     <div class="product-info">
                         <h3>${product.name}</h3>
-                        <div class="product-price">₡${product.price.toLocaleString()}</div>
+                        <div class="product-price">Nio${product.price.toLocaleString()}</div>
                         <div class="product-status ${product.isReserved ? 'reserved' : 'available'}">
                             ${product.isReserved ? 'APARTADO' : 'DISPONIBLE'}
                         </div>
@@ -836,7 +836,7 @@
                 <div style="text-align: center; margin-bottom: 1rem;">
                     <img src="${product.image}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10px;">
                     <h3>${product.name}</h3>
-                    <div style="color: #667eea; font-size: 1.2rem; font-weight: bold;">₡${product.price.toLocaleString()}</div>
+                    <div style="color: #667eea; font-size: 1.2rem; font-weight: bold;">Nio${product.price.toLocaleString()}</div>
                 </div>
             `;
 
@@ -888,7 +888,7 @@
                     NUEVA RESERVA RECIBIDA
                     
                     Producto: ${product.name}
-                    Precio: ₡${product.price.toLocaleString()}
+                    Precio: Nio${product.price.toLocaleString()}
                     
                     Datos del Cliente:
                     - Nombre: ${customerData.name}
