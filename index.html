@@ -674,7 +674,7 @@
                     <img src="${product.image}" alt="${product.name}" class="product-image">
                     <div class="product-info">
                         <h3>${product.name}</h3>
-                        <div class="product-price">₡${product.price.toLocaleString()}</div>
+                        <div class="product-price">C$${product.price.toLocaleString()}</div>
                         <div class="product-status ${product.isReserved ? 'reserved' : 'available'}">
                             ${product.isReserved ? 'APARTADO' : 'DISPONIBLE'}
                         </div>
@@ -888,7 +888,7 @@
                     NUEVA RESERVA RECIBIDA
                     
                     Producto: ${product.name}
-                    Precio: ₡${product.price.toLocaleString()}
+                    Precio:C$ ${product.price.toLocaleString()}
                     
                     Datos del Cliente:
                     - Nombre: ${customerData.name}
