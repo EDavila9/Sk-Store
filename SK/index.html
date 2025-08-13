@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda de Ropa - Sistema de Apartado</title>
+    <style>
+        /* ===== ESTILOS GENERALES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            /* CAMBIAR BACKGROUND: Modifica esta URL por tu imagen de fondo */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 1.8rem;
+        }
+
+        .slogan {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .admin-controls {
+            display: none;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .admin-controls.show {
+            display: flex;
+        }
+
+        /* ===== BOTONES ===== */
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-admin {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        }
+
+        .btn-admin:hover {
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #00b894, #00a085);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #e17055, #d63031);
+        }
+
+        /* ===== PRODUCTOS ===== */
+        .products-section {
+            padding: 2rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .product-info h3 {
+            color: #333;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            color: #667eea;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .product-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .reserved {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .admin-product-controls {
+            display: none;
+            gap: 10px;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-product-controls.show {
+            display: flex;
+        }
+
+        /* ===== MODALES ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+            background: none;
+            border: none;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* ===== LOGIN DE ADMIN ===== */
+        .login-section {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1500;
+        }
+
+        .admin-panel {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .admin-panel.show {
+            display: block;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+            }
+
+            .admin-controls {
+                justify-content: center;
+            }
+        }
+
+        /* ===== TIMER ===== */
+        .timer {
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+
+        /* ===== NOTIFICACIONES ===== */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 3000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #00b894;
+        }
+
+        .notification.error {
+            background: #e17055;
+        }
+
+        .notification.info {
+            background: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <!-- CAMBIAR LOGO: Reemplaza la URL por tu logo -->
+                    <img src="Imagenes/logo.jpg" alt="Logo" id="headerLogo">
+                    <div>
+                        <!-- CAMBIAR NOMBRE DE TIENDA: Modifica este texto -->
+                        <h1 id="storeName">Tu Tienda de Ropa</h1>
+                        <!-- CAMBIAR SLOGAN: Modifica este texto -->
+                        <div class="slogan" id="storeSlogan">La moda que buscas</div>
+                    </div>
+                </div>
+                
+                <div class="admin-controls" id="adminControls">
+                    <button class="btn btn-admin" onclick="openAddProductModal()">Agregar Producto</button>
+                    <button class="btn btn-admin" onclick="openSiteSettingsModal()">Configurar Sitio</button>
+                    <button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- SECCIÓN DE LOGIN ADMIN -->
+    <div class="login-section">
+        <button class="btn btn-admin" id="loginBtn" onclick="openLoginModal()">Admin</button>
+        <div class="admin-panel" id="adminPanel">
+            <p>Sesión Activa</p>
+            <button class="btn btn-danger" onclick="logout()">Salir</button>
+        </div>
+    </div>
+
+    <main class="container">
+        <section class="products-section">
+            <h2 class="section-title" id="mainTitle">Nuestros Productos</h2>
+            <div class="products-grid" id="productsGrid">
+                <!-- Los productos se cargarán aquí dinámicamente -->
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL DE LOGIN ADMIN -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Acceso Administrador</h2>
+            <div class="form-group">
+                <label for="adminUser">Usuario:</label>
+                <!-- CAMBIAR USUARIO ADMIN: Modifica el valor predeterminado -->
+                <input type="text" id="adminUser" placeholder="admin" value="admin">
+            </div>
+            <div class="form-group">
+                <label for="adminPass">Contraseña:</label>
+                <!-- CAMBIAR CONTRASEÑA ADMIN: Modifica el valor predeterminado -->
+                <input type="password" id="adminPass" placeholder="admin123" value="admin123">
+            </div>
+            <button class="btn" onclick="adminLogin()">Ingresar</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE APARTADO -->
+    <div id="reservationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('reservationModal')">&times;</span>
+            <h2>Apartar Producto</h2>
+            <div id="selectedProduct"></div>
+            <form id="reservationForm">
+                <div class="form-group">
+                    <label for="customerName">Nombre Completo:</label>
+                    <input type="text" id="customerName" required placeholder="Ingresa tu nombre completo">
+                </div>
+                <div class="form-group">
+                    <label for="customerPhone">Número de Celular:</label>
+                    <input type="tel" id="customerPhone" required placeholder="Ej: +506 1234-5678">
+                </div>
+                <div class="form-group">
+                    <label for="customerEmail">Email (Opcional):</label>
+                    <input type="email" id="customerEmail" placeholder="tu@email.com">
+                </div>
+                <button type="submit" class="btn">Apartar por 48 Horas</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR/EDITAR PRODUCTO -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('productModal')">&times;</span>
+            <h2 id="productModalTitle">Agregar Producto</h2>
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="productName">Nombre del Producto:</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Precio:</label>
+                    <input type="number" id="productPrice" required step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="productDescription">Descripción:</label>
+                    <textarea id="productDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="productImage">Imagen del Producto:</label>
+                    <input type="file" id="productImage" accept="image/*">
+                    <div id="imagePreview" style="margin-top: 10px;"></div>
+                </div>
+                <button type="submit" class="btn">Guardar Producto</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIGURACIÓN DEL SITIO -->
+    <div id="siteSettingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('siteSettingsModal')">&times;</span>
+            <h2>Configuración del Sitio</h2>
+            <form id="siteSettingsForm">
+                <div class="form-group">
+                    <label for="siteName">Nombre de la Tienda:</label>
+                    <input type="text" id="siteName" required>
+                </div>
+                <div class="form-group">
+                    <label for="siteSlogan">Eslogan:</label>
+                    <input type="text" id="siteSlogan">
+                </div>
+                <div class="form-group">
+                    <label for="siteTitle">Título Principal:</label>
+                    <input type="text" id="siteTitle">
+                </div>
+                <div class="form-group">
+                    <label for="siteLogo">Logo:</label>
+                    <input type="file" id="siteLogo" accept="image/*">
+                    <div id="logoPreview" style="margin-top: 10px;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="backgroundColor">Color de Fondo:</label>
+                    <select id="backgroundColor">
+                        <option value="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">Azul-Morado</option>
+                        <option value="linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)">Rosa</option>
+                        <option value="linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)">Aqua-Rosa</option>
+                        <option value="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">Verde-Azul</option>
+                        <option value="linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)">Naranja</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Guardar Configuración</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /* ===== CONFIGURACIÓN INICIAL ===== */
+        // CAMBIAR EMAIL: Reemplaza por tu email donde quieres recibir las notificaciones
+        const ADMIN_EMAIL = 'effinalexander@gmail.com';
+        
+        // CAMBIAR CREDENCIALES ADMIN: Modifica usuario y contraseña
+        const ADMIN_CREDENTIALS = {
+            username: 'admin',
+            password: 'admin'
+        };
+
+        // Variables globales
+        let products = [];
+        let isAdminLoggedIn = false;
+        let currentEditingProduct = null;
+
+        /* ===== INICIALIZACIÓN ===== */
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSiteSettings();
+            loadProducts();
+            setupEventListeners();
+            checkExpiredReservations();
+            
+            // Verificar reservaciones expiradas cada minuto
+            setInterval(checkExpiredReservations, 60000);
+        });
+
+        function setupEventListeners() {
+            // Formulario de reservación
+            document.getElementById('reservationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                processReservation();
+            });
+
+            // Formulario de productos
+            document.getElementById('productForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveProduct();
+            });
+
+            // Formulario de configuración del sitio
+            document.getElementById('siteSettingsForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveSiteSettings();
+            });
+
+            // Preview de imágenes
+            document.getElementById('productImage').addEventListener('change', function(e) {
+                previewImage(e, 'imagePreview');
+            });
+
+            document.getElementById('siteLogo').addEventListener('change', function(e) {
+                previewImage(e, 'logoPreview');
+            });
+        }
+
+        /* ===== GESTIÓN DE MODALES ===== */
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        /* ===== SISTEMA DE ADMINISTRACIÓN ===== */
+        function adminLogin() {
+            const username = document.getElementById('adminUser').value;
+            const password = document.getElementById('adminPass').value;
+
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                isAdminLoggedIn = true;
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('adminPanel').classList.add('show');
+                document.getElementById('adminControls').classList.add('show');
+                
+                // Mostrar controles de admin en productos
+                document.querySelectorAll('.admin-product-controls').forEach(control => {
+                    control.classList.add('show');
+                });
+
+                closeModal('loginModal');
+                showNotification('¡Bienvenido Administrador!', 'success');
+            } else {
+                showNotification('Credenciales incorrectas', 'error');
+            }
+        }
+
+        function logout() {
+            isAdminLoggedIn = false;
+            document.getElementById('loginBtn').style.display = 'block';
+            document.getElementById('adminPanel').classList.remove('show');
+            document.getElementById('adminControls').classList.remove('show');
+            
+            // Ocultar controles de admin en productos
+            document.querySelectorAll('.admin-product-controls').forEach(control => {
+                control.classList.remove('show');
+            });
+
+            showNotification('Sesión cerrada', 'info');
+        }
+
+        /* ===== GESTIÓN DE PRODUCTOS ===== */
+        function loadProducts() {
+            const savedProducts = localStorage.getItem('storeProducts');
+            if (savedProducts) {
+                products = JSON.parse(savedProducts);
+            } else {
+                // Productos de ejemplo
+                products = [
+                    {
+                        id: 1,
+                        name: 'Camiseta Casual',
+                        price: 25000,
+                        description: 'Camiseta cómoda de algodón 100%',
+                        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDMwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjZjBmMGYwIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTI1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTk5IiBmb250LXNpemU9IjE4IiBmb250LWZhbWlseT0iQXJpYWwiPkNhbWlzZXRhPC90ZXh0Pgo8L3N2Zz4K',
+                        isReserved: false,
+                        reservedBy: null,
+                        reservationEnd: null
+                    },
+                    {
+                        id: 2,
+                        name: 'Pantalón Jeans',
+                        price: 45000,
+                        description: 'Jeans de corte moderno',
+                        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDMwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjZTBlMGUwIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTI1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNzc3IiBmb250LXNpemU9IjE4IiBmb250LWZhbWlseT0iQXJpYWwiPlBhbnRhbMOzbjwvdGV4dD4KPC9zdmc+Cg==',
+                        isReserved: false,
+                        reservedBy: null,
+                        reservationEnd: null
+                    }
+                ];
+                saveProducts();
+            }
+            renderProducts();
+        }
+
+        function saveProducts() {
+            localStorage.setItem('storeProducts', JSON.stringify(products));
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <div class="product-price">₡${product.price.toLocaleString()}</div>
+                        <div class="product-status ${product.isReserved ? 'reserved' : 'available'}">
+                            ${product.isReserved ? 'APARTADO' : 'DISPONIBLE'}
+                        </div>
+                        ${product.description ? `<p>${product.description}</p>` : ''}
+                        ${product.isReserved ? `
+                            <div class="timer" id="timer-${product.id}">
+                                Tiempo restante: <span id="countdown-${product.id}">Calculando...</span>
+                            </div>
+                        ` : `
+                            <button class="btn" onclick="openReservationModal(${product.id})">Apartar</button>
+                        `}
+                        
+                        <div class="admin-product-controls ${isAdminLoggedIn ? 'show' : ''}" id="admin-controls-${product.id}">
+                            <button class="btn btn-admin" onclick="editProduct(${product.id})">Editar</button>
+                            <button class="btn btn-danger" onclick="deleteProduct(${product.id})">Eliminar</button>
+                            ${product.isReserved ? `
+                                <button class="btn btn-success" onclick="releaseReservation(${product.id})">Liberar</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(productCard);
+
+                // Inicializar countdown si está reservado
+                if (product.isReserved) {
+                    updateCountdown(product.id);
+                }
+            });
+        }
+
+        function openAddProductModal() {
+            if (!isAdminLoggedIn) return;
+            
+            currentEditingProduct = null;
+            document.getElementById('productModalTitle').textContent = 'Agregar Producto';
+            document.getElementById('productForm').reset();
+            document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('productModal').style.display = 'block';
+        }
+
+        function editProduct(productId) {
+            if (!isAdminLoggedIn) return;
+            
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            currentEditingProduct = product;
+            document.getElementById('productModalTitle').textContent = 'Editar Producto';
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('productDescription').value = product.description || '';
+            
+            // Mostrar imagen actual
+            document.getElementById('imagePreview').innerHTML = `
+                <img src="${product.image}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;">
+            `;
+            
+            document.getElementById('productModal').style.display = 'block';
+        }
+
+        function saveProduct() {
+            if (!isAdminLoggedIn) return;
+
+            const name = document.getElementById('productName').value;
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const description = document.getElementById('productDescription').value;
+            const imageFile = document.getElementById('productImage').files[0];
+
+            if (currentEditingProduct) {
+                // Editar producto existente
+                currentEditingProduct.name = name;
+                currentEditingProduct.price = price;
+                currentEditingProduct.description = description;
+
+                if (imageFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        currentEditingProduct.image = e.target.result;
+                        saveProducts();
+                        renderProducts();
+                        closeModal('productModal');
+                        showNotification('Producto actualizado exitosamente', 'success');
+                    };
+                    reader.readAsDataURL(imageFile);
+                } else {
+                    saveProducts();
+                    renderProducts();
+                    closeModal('productModal');
+                    showNotification('Producto actualizado exitosamente', 'success');
+                }
+            } else {
+                // Crear nuevo producto
+                const newProduct = {
+                    id: Date.now(), // ID único basado en timestamp
+                    name: name,
+                    price: price,
+                    description: description,
+                    image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDMwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjZjBmMGYwIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTI1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTk5IiBmb250LXNpemU9IjE4IiBmb250LWZhbWlseT0iQXJpYWwiPk51ZXZvPC90ZXh0Pgo8L3N2Zz4K', // Imagen por defecto
+                    isReserved: false,
+                    reservedBy: null,
+                    reservationEnd: null
+                };
+
+                if (imageFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        newProduct.image = e.target.result;
+                        products.push(newProduct);
+                        saveProducts();
+                        renderProducts();
+                        closeModal('productModal');
+                        showNotification('Producto agregado exitosamente', 'success');
+                    };
+                    reader.readAsDataURL(imageFile);
+                } else {
+                    products.push(newProduct);
+                    saveProducts();
+                    renderProducts();
+                    closeModal('productModal');
+                    showNotification('Producto agregado exitosamente', 'success');
+                }
+            }
+        }
+
+        function deleteProduct(productId) {
+            if (!isAdminLoggedIn) return;
+            
+            if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+                products = products.filter(p => p.id !== productId);
+                saveProducts();
+                renderProducts();
+                showNotification('Producto eliminado', 'info');
+            }
+        }
+
+        function releaseReservation(productId) {
+            if (!isAdminLoggedIn) return;
+            
+            const product = products.find(p => p.id === productId);
+            if (product && product.isReserved) {
+                product.isReserved = false;
+                product.reservedBy = null;
+                product.reservationEnd = null;
+                saveProducts();
+                renderProducts();
+                showNotification('Reservación liberada', 'success');
+            }
+        }
+
+        /* ===== SISTEMA DE APARTADO ===== */
+        function openReservationModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product || product.isReserved) {
+                showNotification('Este producto no está disponible', 'error');
+                return;
+            }
+
+            document.getElementById('selectedProduct').innerHTML = `
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <img src="${product.image}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10px;">
+                    <h3>${product.name}</h3>
+                    <div style="color: #667eea; font-size: 1.2rem; font-weight: bold;">₡${product.price.toLocaleString()}</div>
+                </div>
+            `;
+
+            document.getElementById('reservationModal').style.display = 'block';
+            document.getElementById('reservationForm').dataset.productId = productId;
+        }
+
+        function processReservation() {
+            const form = document.getElementById('reservationForm');
+            const productId = parseInt(form.dataset.productId);
+            const product = products.find(p => p.id === productId);
+
+            if (!product || product.isReserved) {
+                showNotification('Error: Producto no disponible', 'error');
+                return;
+            }
+
+            const customerData = {
+                name: document.getElementById('customerName').value,
+                phone: document.getElementById('customerPhone').value,
+                email: document.getElementById('customerEmail').value
+            };
+
+            // Marcar producto como reservado por 48 horas
+            const reservationEnd = new Date();
+            reservationEnd.setHours(reservationEnd.getHours() + 48);
+
+            product.isReserved = true;
+            product.reservedBy = customerData;
+            product.reservationEnd = reservationEnd.toISOString();
+
+            saveProducts();
+            renderProducts();
+
+            // Enviar email de notificación
+            sendReservationEmail(product, customerData);
+
+            closeModal('reservationModal');
+            form.reset();
+            showNotification('¡Producto apartado exitosamente por 48 horas!', 'success');
+        }
+
+        function sendReservationEmail(product, customerData) {
+            // Simular envío de email (en producción necesitarías un servicio backend)
+            const emailData = {
+                to: ADMIN_EMAIL,
+                subject: `Nueva Reserva - ${product.name}`,
+                body: `
+                    NUEVA RESERVA RECIBIDA
+                    
+                    Producto: ${product.name}
+                    Precio: ₡${product.price.toLocaleString()}
+                    
+                    Datos del Cliente:
+                    - Nombre: ${customerData.name}
+                    - Teléfono: ${customerData.phone}
+                    - Email: ${customerData.email || 'No proporcionado'}
+                    
+                    Fecha de Reserva: ${new Date().toLocaleString()}
+                    Vence: ${new Date(product.reservationEnd).toLocaleString()}
+                    
+                    ¡Contacta al cliente para coordinar la entrega!
+                `
+            };
+
+            // Aquí implementarías la lógica real de envío
+            console.log('Email enviado:', emailData);
+            
+            // Para desarrollo, mostrar en consola
+            alert(`Email simulado enviado a ${ADMIN_EMAIL}\n\nDatos del cliente:\nNombre: ${customerData.name}\nTeléfono: ${customerData.phone}`);
+        }
+
+        function checkExpiredReservations() {
+            const now = new Date();
+            let hasChanges = false;
+
+            products.forEach(product => {
+                if (product.isReserved && new Date(product.reservationEnd) <= now) {
+                    product.isReserved = false;
+                    product.reservedBy = null;
+                    product.reservationEnd = null;
+                    hasChanges = true;
+                }
+            });
+
+            if (hasChanges) {
+                saveProducts();
+                renderProducts();
+            }
+        }
+
+        function updateCountdown(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product || !product.isReserved) return;
+
+            const countdownElement = document.getElementById(`countdown-${productId}`);
+            if (!countdownElement) return;
+
+            const now = new Date();
+            const end = new Date(product.reservationEnd);
+            const diff = end - now;
+
+            if (diff <= 0) {
+                countdownElement.textContent = 'EXPIRADO';
+                return;
+            }
+
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            countdownElement.textContent = `${hours}h ${minutes}m`;
+
+            // Actualizar cada minuto
+            setTimeout(() => updateCountdown(productId), 60000);
+        }
+
+        /* ===== CONFIGURACIÓN DEL SITIO ===== */
+        function openSiteSettingsModal() {
+            if (!isAdminLoggedIn) return;
+
+            const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+            
+            document.getElementById('siteName').value = settings.name || 'Tu Tienda de Ropa';
+            document.getElementById('siteSlogan').value = settings.slogan || 'La moda que buscas';
+            document.getElementById('siteTitle').value = settings.title || 'Nuestros Productos';
+            document.getElementById('backgroundColor').value = settings.background || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            
+            if (settings.logo) {
+                document.getElementById('logoPreview').innerHTML = `
+                    <img src="${settings.logo}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                `;
+            }
+
+            document.getElementById('siteSettingsModal').style.display = 'block';
+        }
+
+        function saveSiteSettings() {
+            if (!isAdminLoggedIn) return;
+
+            const settings = {
+                name: document.getElementById('siteName').value,
+                slogan: document.getElementById('siteSlogan').value,
+                title: document.getElementById('siteTitle').value,
+                background: document.getElementById('backgroundColor').value,
+                logo: null
+            };
+
+            const logoFile = document.getElementById('siteLogo').files[0];
+
+            if (logoFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    settings.logo = e.target.result;
+                    localStorage.setItem('siteSettings', JSON.stringify(settings));
+                    applySiteSettings(settings);
+                    closeModal('siteSettingsModal');
+                    showNotification('Configuración guardada exitosamente', 'success');
+                };
+                reader.readAsDataURL(logoFile);
+            } else {
+                const existingSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+                settings.logo = existingSettings.logo;
+                localStorage.setItem('siteSettings', JSON.stringify(settings));
+                applySiteSettings(settings);
+                closeModal('siteSettingsModal');
+                showNotification('Configuración guardada exitosamente', 'success');
+            }
+        }
+
+        function loadSiteSettings() {
+            const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+            applySiteSettings(settings);
+        }
+
+        function applySiteSettings(settings) {
+            if (settings.name) {
+                document.getElementById('storeName').textContent = settings.name;
+            }
+            if (settings.slogan) {
+                document.getElementById('storeSlogan').textContent = settings.slogan;
+            }
+            if (settings.title) {
+                document.getElementById('mainTitle').textContent = settings.title;
+            }
+            if (settings.background) {
+                document.body.style.background = settings.background;
+            }
+            if (settings.logo) {
+                document.getElementById('headerLogo').src = settings.logo;
+            }
+        }
+
+        /* ===== PREVIEW DE IMÁGENES ===== */
+        function previewImage(event, previewElementId) {
+            const file = event.target.files[0];
+            const previewElement = document.getElementById(previewElementId);
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = '100px';
+                    img.style.height = '100px';
+                    img.style.objectFit = 'cover';
+                    img.style.borderRadius = '5px';
+                    img.style.border = '2px solid #ddd';
+                    
+                    previewElement.innerHTML = '';
+                    previewElement.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        /* ===== NOTIFICACIONES ===== */
+        function showNotification(message, type = 'info') {
+            // Crear elemento de notificación
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            // Agregar al DOM
+            document.body.appendChild(notification);
+            
+            // Mostrar con animación
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            // Ocultar después de 3 segundos
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        /* ===== EVENTOS DE TECLADO ===== */
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Cerrar todos los modales abiertos
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            }
+        });
+
+        // Funciones adicionales para mejorar la experiencia de usuario
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('es-CR', {
+                style: 'currency',
+                currency: 'CRC'
+            }).format(amount);
+        }
+
+        function validatePhone(phone) {
+            const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/;
+            return phoneRegex.test(phone);
+        }
+
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Validación en tiempo real para formularios
+        document.addEventListener('input', function(e) {
+            if (e.target.type === 'tel') {
+                if (!validatePhone(e.target.value) && e.target.value.length > 0) {
+                    e.target.style.borderColor = '#e17055';
+                } else {
+                    e.target.style.borderColor = '#ddd';
+                }
+            }
+            
+            if (e.target.type === 'email') {
+                if (!validateEmail(e.target.value) && e.target.value.length > 0) {
+                    e.target.style.borderColor = '#e17055';
+                } else {
+                    e.target.style.borderColor = '#ddd';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
